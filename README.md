@@ -4,11 +4,11 @@
 
 ---
 
-## 📌 Project Overview
+##  Project Overview
 
 This project implements a scalable core engine for a Task Management System like Jira or Trello. It is designed specifically to highlight clean software design, strict encapsulation, role-based access control, state machine integrity, and decoupled event handling.
 
-### 🌟 Key Resume & Technical Highlights
+###  Key Resume & Technical Highlights
 * **SOLID Principles**: Single responsibility classes, Open/Closed strategy & state extensions, Interface Segregation, and Dependency Inversion.
 * **State Machine Pattern**: Enforces valid status transitions (`TODO` → `IN_PROGRESS` → `REVIEW` → `DONE`), guarding against invalid jumps while allowing role-based overrides.
 * **Strategy Pattern Search Engine**: Pluggable filtering algorithms combining Priority, Status, Assignee, and Keyword search seamlessly.
@@ -19,7 +19,7 @@ This project implements a scalable core engine for a Task Management System like
 
 ---
 
-## 📐 Low-Level Design Architecture
+##  Low-Level Design Architecture
 
 ```mermaid
 classDiagram
@@ -111,7 +111,7 @@ classDiagram
 
 ---
 
-## 🎨 Design Patterns Implemented
+##  Design Patterns Implemented
 
 | Pattern | Component File | Description & Problem Solved |
 | :--- | :--- | :--- |
@@ -191,20 +191,6 @@ Open your browser and navigate to:
 | `GET` | `/api/search` | Search/filter tasks (Strategy pattern) | Query: `status`, `priority`, `assigneeId`, `query` |
 | `GET` | `/api/users` | List all system users | — |
 | `GET` | `/api/notifications/user/:userId` | Get user notification feed | — |
-
----
-
-## 💡 How to Explain This Project in an Interview (2-Minute Pitch)
-
-> *"I designed and built a Low-Level Design project for a Task Management System similar to Jira/Trello.
-> 
-> To ensure clean code and extensibility, I applied key Object-Oriented Design Patterns:
-> 1. **State Pattern** for task lifecycle transitions (`TODO` → `IN_PROGRESS` → `REVIEW` → `DONE`), making it impossible for a task to jump state illegally without going through review unless authorized by an Admin.
-> 2. **Strategy Pattern** for the search engine, allowing composite queries across priority, assignee, status, and text search.
-> 3. **Observer Pattern** for notifications, so when a task is created or moved, subscribed listeners generate notifications asynchronously without coupling the core task service.
-> 4. **RBAC** for role-based authorization (`ADMIN`, `MANAGER`, `MEMBER`, `GUEST`).
-> 
-> The project includes a generic in-memory repository with JSON file persistence, REST API endpoints, an 8-step automated unit test suite, and an interactive Kanban board UI to showcase live state transitions."*
 
 ---
 
