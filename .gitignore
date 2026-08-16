@@ -1,0 +1,17 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Node / JS
+node_modules/
+dist/
+*.log
+
+# Persistence & Data files
+data/*.json
+
+# IDE / System
+.vscode/
+.idea/
+.DS_Store

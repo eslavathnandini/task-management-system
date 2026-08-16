@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Management System - Mini Jira / Trello LLD</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Navigation Header -->
+    <header class="navbar">
+      <div class="logo-group">
+        <div class="logo-icon">⚡</div>
+        <div>
+          <h1>TaskFlow LLD</h1>
+          <p class="subtitle">Mini Jira & Trello Architecture Engine</p>
+        </div>
+      </div>
+
+      <!-- Controls & RBAC User Switcher -->
+      <div class="header-controls">
+        <div class="user-context-selector">
+          <label for="userSelect">Active Role Context (RBAC):</label>
+          <select id="userSelect" class="styled-select">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <button id="btnNewTask" class="btn btn-primary">+ Create Task</button>
+
+        <div class="notification-wrapper">
+          <button id="btnNotifications" class="icon-btn" title="Notifications">
+            🔔 <span id="notifBadge" class="badge">0</span>
+          </button>
+          <div id="notifDropdown" class="dropdown-panel hidden">
+            <h3>Notifications</h3>
+            <div id="notifList" class="notif-list">
+              <p class="empty-text">No unread notifications</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Toolbar: Search & Filters (Strategy Pattern Visualized) -->
+    <section class="toolbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search tasks by key, title, description...">
+      </div>
+
+      <div class="filter-group">
+        <select id="filterPriority" class="styled-select">
+          <option value="">All Priorities</option>
+          <option value="LOW">Low</option>
+          <option value="MEDIUM">Medium</option>
+          <option value="HIGH">High</option>
+          <option value="URGENT">Urgent 🚨</option>
+        </select>
+
+        <select id="filterAssignee" class="styled-select">
+          <option value="">All Assignees</option>
+        </select>
+
+        <button id="btnResetFilters" class="btn btn-secondary">Reset Filters</button>
+      </div>
+
+      <div id="activeUserBadge" class="user-pill">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- Kanban Board Grid (State Pattern Visualized) -->
+    <main class="board-grid">
+      <!-- TODO Column -->
+      <div class="kanban-column" data-status="TODO">
+        <div class="column-header status-todo">
+          <h2><span>📋</span> TODO</h2>
+          <span id="count-TODO" class="column-count">0</span>
+        </div>
+        <div id="list-TODO" class="task-list"></div>
+      </div>
+
+      <!-- IN_PROGRESS Column -->
+      <div class="kanban-column" data-status="IN_PROGRESS">
+        <div class="column-header status-progress">
+          <h2><span>⚙️</span> IN PROGRESS</h2>
+          <span id="count-IN_PROGRESS" class="column-count">0</span>
+        </div>
+        <div id="list-IN_PROGRESS" class="task-list"></div>
+      </div>
+
+      <!-- REVIEW Column -->
+      <div class="kanban-column" data-status="REVIEW">
+        <div class="column-header status-review">
+          <h2><span>🔍</span> IN REVIEW</h2>
+          <span id="count-REVIEW" class="column-count">0</span>
+        </div>
+        <div id="list-REVIEW" class="task-list"></div>
+      </div>
+
+      <!-- DONE Column -->
+      <div class="kanban-column" data-status="DONE">
+        <div class="column-header status-done">
+          <h2><span>✅</span> DONE</h2>
+          <span id="count-DONE" class="column-count">0</span>
+        </div>
+        <div id="list-DONE" class="task-list"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Create Task Modal -->
+  <div id="modalTask" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Create New Task</h2>
+        <button class="close-modal" id="btnCloseTaskModal">&times;</button>
+      </div>
+      <form id="createTaskForm">
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text" id="taskTitleInput" required placeholder="e.g. Refactor SearchStrategy logic">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="taskDescInput" rows="3" placeholder="Add technical task requirements..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Priority</label>
+            <select id="taskPriorityInput" class="styled-select">
+              <option value="LOW">Low</option>
+              <option value="MEDIUM" selected>Medium</option>
+              <option value="HIGH">High</option>
+              <option value="URGENT">Urgent 🚨</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Assignee</label>
+            <select id="taskAssigneeInput" class="styled-select">
+              <option value="">Unassigned</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Deadline</label>
+          <input type="date" id="taskDeadlineInput">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelTaskModal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Task Detail & History Drawer -->
+  <div id="modalDetail" class="modal-overlay hidden">
+    <div class="modal-card wide-modal">
+      <div class="modal-header">
+        <div>
+          <span id="detailKey" class="task-key-badge"></span>
+          <h2 id="detailTitle" style="display: inline; margin-left: 8px;"></h2>
+        </div>
+        <button class="close-modal" id="btnCloseDetailModal">&times;</button>
+      </div>
+      <div class="modal-body modal-grid">
+        <div class="task-info-pane">
+          <p id="detailDesc" class="task-desc-text"></p>
+
+          <div class="meta-specs">
+            <div><strong>Status:</strong> <span id="detailStatus"></span></div>
+            <div><strong>Priority:</strong> <span id="detailPriority"></span></div>
+            <div><strong>Assignee:</strong> <span id="detailAssignee"></span></div>
+            <div><strong>Reporter:</strong> <span id="detailReporter"></span></div>
+            <div><strong>Deadline:</strong> <span id="detailDeadline"></span></div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="action-bar">
+            <label>Move Status (State Pattern):</label>
+            <div id="statusActionButtons" class="btn-group"></div>
+          </div>
+
+          <!-- Comments Section -->
+          <div class="comments-section">
+            <h3>Comments & Discussions</h3>
+            <div id="commentsList" class="comments-list"></div>
+            <div class="add-comment-box">
+              <input type="text" id="commentInput" placeholder="Write a comment...">
+              <button id="btnPostComment" class="btn btn-primary btn-sm">Post</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task History Audit Log Drawer -->
+        <div class="history-pane">
+          <h3>📜 Audit Log History</h3>
+          <div id="historyTimeline" class="timeline"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
